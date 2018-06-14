@@ -23,6 +23,9 @@ public class PlayerMovementComponent : MonoBehaviour {
     private Vector3 velocity;
 
     [Header("Animation")]
+    private int runState;
+    private float runTime;
+    public float frameTime;
     public Sprite idleSprite;
     public Sprite run1Sprite;
     public Sprite run2Sprite;
@@ -97,12 +100,26 @@ public class PlayerMovementComponent : MonoBehaviour {
     void UpdateAnimation(){
         spriteRenderer.flipX = velocity.x < 0.0f;
 
-        if(Mathf.Abs(velocity.x) > 0.05f){
+        if(Mathf.Abs(velocity.x) > 0.1f){
+            if(runTime + frameTime <= Time.time){
+                runTime = Time.time;
+                runState = (runState + 1) % 4;
+
+                if(runState == 0 || runState == 2){
+                    spriteRenderer.sprite = idleSprite;
+                } else if(runState == 1){
+                    spriteRenderer.sprite = run1Sprite;
+                } else {
+                    spriteRenderer.sprite = run2Sprite;
+                }
+            }
             // run animation...
+        } else {
+            spriteRenderer.sprite = idleSprite;
         }
 
         // stomp all the other sprites if we're jumping or falling
-        if(velocity.y < 0.05f){
+        if(velocity.y < -0.05f){
             spriteRenderer.sprite = fallSprite;
         } else if(velocity.y > 0.05f){
             spriteRenderer.sprite = jumpSprite;
